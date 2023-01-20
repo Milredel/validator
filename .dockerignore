@@ -1,0 +1,8 @@
+.git
+README.md
+dist
+node_modules
+npm-debug.log
+scripts/docker
+test
+docs
