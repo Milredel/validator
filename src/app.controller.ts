@@ -14,7 +14,8 @@ export class AppController {
      * @returns 'Hello World!'
      */
     @Get()
-    async hashPass(@Request() req) {
+    helloWorld(): string {
+        this.logger.info('Hello World!');
         return 'Hello World!';
     }
 
