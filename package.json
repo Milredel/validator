@@ -15,7 +15,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"target\": \"es2017\", \"module\": \"commonjs\"}' node node_modules/mocha/bin/_mocha --require ts-node/register 'src/**/*.spec.ts'"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"target\": \"es2017\", \"module\": \"commonjs\"}' node node_modules/mocha/bin/_mocha --require ts-node/register 'src/**/*.spec.ts'",
+    "test:coverage": "env TS_NODE_COMPILER_OPTIONS='{\"target\": \"es2017\", \"module\": \"commonjs\"}' node node_modules/nyc/bin/nyc --reporter=text node_modules/mocha/bin/_mocha --require ts-node/register 'src/**/*.spec.ts'"
   },
   "dependencies": {
     "@nestjs/common": "^7.6.5",
