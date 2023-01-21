@@ -12,4 +12,6 @@ export class Movement {
 
     @IsNumber()
     amount: number;
+
+    isDuplicate?: boolean;
 }

@@ -6,4 +6,6 @@ export class Balance {
 
     @IsNumber()
     balance: number;
+
+    isDuplicate?: boolean;
 }
