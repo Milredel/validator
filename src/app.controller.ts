@@ -54,6 +54,7 @@ export class AppController {
             currentComputedBalance = Object.prototype.hasOwnProperty.call(line, 'amount') ? (currentComputedBalance + (line as Movement).amount) : currentComputedBalance;
             isNewBalance = Object.prototype.hasOwnProperty.call(line, 'balance') ? true : false;
             if (isNewBalance) { // we need to check if sum is same as announced balance
+                // assuming here Balance.balance has just the balance of the last movements, not the sum of all Movement.amount from the beginning
                 nextBalance = line;
                 currentFoundBalance = (line as Balance).balance;
                 if (currentComputedBalance !== currentFoundBalance) {
