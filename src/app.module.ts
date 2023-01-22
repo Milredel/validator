@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { AppService } from './app.service';
 
 @Module({
     imports: [
@@ -31,6 +32,11 @@ import * as winston from 'winston';
     controllers: [
         AppController
     ],
-    providers: [],
+    providers: [
+        AppService,
+    ],
+    exports: [
+        AppService,
+    ]
 })
 export class AppModule { }
