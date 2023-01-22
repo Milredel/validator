@@ -1,14 +1,17 @@
 import { AppController } from './app.controller';
 import { expect, stub, stubClass } from './test';
 import * as winston from 'winston';
+import { AppService } from './app.service';
 
 describe('AppController', () => {
     let controller: AppController;
     const logger = winston.createLogger();
+    let appService;
 
     beforeEach(() => {
         controller = new AppController(
-            logger
+            logger,
+            appService = stubClass(AppService)
         );
     });
 
