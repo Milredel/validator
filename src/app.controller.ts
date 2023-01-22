@@ -3,6 +3,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationDataDto } from './common/dto/validationData.dto';
 import { AppService } from './app.service';
+import { Utils } from './common/utils/utils';
 
 @Controller()
 export class AppController {
@@ -33,7 +34,7 @@ export class AppController {
 
         const {result, reasons} = this.appService.validate(validationDataDto);
 
-        if (reasons) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
+        if (!Utils.isEmpty(reasons)) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
             return response.status(HttpStatus.I_AM_A_TEAPOT).send({statusCode: HttpStatus.I_AM_A_TEAPOT, reasons: reasons});
         }
 

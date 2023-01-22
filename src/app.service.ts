@@ -49,7 +49,8 @@ export class AppService {
         const duplicateErrors = {
             movements: [],
             balances: []
-        };
+        } as DuplicateError;
+
         for (const line of markedInputDataMerged) { // first we check potential balance errors, id est differences between Balance.balance and summed movements.amount for the given interval
             currentComputedBalance = Object.prototype.hasOwnProperty.call(line, 'amount') ? (currentComputedBalance + (line as Movement).amount) : currentComputedBalance;
             isNewBalance = Object.prototype.hasOwnProperty.call(line, 'balance') ? true : false;
@@ -64,7 +65,7 @@ export class AppService {
                         diff: {
                             expected: currentFoundBalance,
                             computed: currentComputedBalance,
-                            delta: currentFoundBalance - currentComputedBalance
+                            delta: parseFloat((currentFoundBalance - currentComputedBalance).toFixed(10)) // to have a human readable number if floating numbers
                         },
                         movements: movementsForBalance
                     });
@@ -77,9 +78,8 @@ export class AppService {
                 movementsForBalance.push(line);
             }
             if (Object.prototype.hasOwnProperty.call(line, 'isDuplicate') && line.isDuplicate === true) {
-                const key = isNewBalance ? 'balances' : 'movements';
                 delete line.isDuplicate;
-                duplicateErrors[key].push(line);
+                isNewBalance ? duplicateErrors.balances.push(<Balance>line) : duplicateErrors.movements.push(<Movement>line);
             }
         }
 

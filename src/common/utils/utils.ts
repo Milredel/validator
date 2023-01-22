@@ -4,4 +4,8 @@ export abstract class Utils {
         return JSON.stringify(o1) === JSON.stringify(o2);
     }
 
+    static isEmpty(obj: any): boolean {
+        return obj && Object.keys(obj).length === 0 && Object.getPrototypeOf(obj) === Object.prototype;
+    }
+
 }
