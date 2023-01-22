@@ -39,12 +39,11 @@ export class AppController {
 
         const markedinputDataMerged = inputDataMerged.reduce((p,c) => p.some(o => Utils.compareObjects(o, c)) ? (c.isDuplicate = true, p.concat(c)) : p.concat(c),[]); // marking duplicate movement or balance, maybe the test (Utils.compareObjects) should not be so strict
 
-        // TODO remove potential duplicate balances before checking balance errors
-
         let currentFoundBalance = 0;
         let currentComputedBalance = 0;
         let isNewBalance = false;
         let currentBalance, nextBalance = null;
+        let movementsForBalance = [];
         const balanceErrors = [];
         const duplicateErrors = {
             movements: [],
@@ -65,12 +64,16 @@ export class AppController {
                             expected: currentFoundBalance,
                             computed: currentComputedBalance,
                             delta: currentFoundBalance - currentComputedBalance
-                        }
+                        },
+                        movements: movementsForBalance
                     });
                 }
                 currentComputedBalance = 0;
                 currentBalance = nextBalance;
                 nextBalance = null;
+                movementsForBalance = [];
+            } else {
+                movementsForBalance.push(line);
             }
             if (Object.prototype.hasOwnProperty.call(line, 'isDuplicate') && line.isDuplicate === true) {
                 const key = isNewBalance ? 'balances' : 'movements';
