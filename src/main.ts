@@ -8,14 +8,14 @@ async function bootstrap() {
     app.use(helmet());
     app.enableCors();
     app.useGlobalPipes(
-        new ValidationPipe({
+        new ValidationPipe({ // this allow to print validation error when performing format test with pipe below
             exceptionFactory: (validationErrors: ValidationError[] = []) => {
                 console.error(validationErrors);
                 return new BadRequestException(validationErrors);
             },
             transform: true,
         }),
-        new ValidationPipe({
+        new ValidationPipe({ // this allows to validate payload format before entering in controller code
             whitelist: true,
             forbidNonWhitelisted: true,
             validationError: {
