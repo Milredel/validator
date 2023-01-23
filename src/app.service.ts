@@ -17,6 +17,13 @@ export class AppService {
         // nothing to see here
     }
 
+    /**
+     * Main function, prepare data and check for errors
+     *
+     * @param {ValidationDataDto} validationDataDto
+     * @returns {{result: string, reasons: Reasons}}
+     * @memberof AppService
+     */
     validate(validationDataDto: ValidationDataDto): {result: string, reasons: Reasons} {
 
         const inputDataMerged = this.mergeAndSortData(validationDataDto);
@@ -28,6 +35,13 @@ export class AppService {
         return {result: 'ok', reasons: reasons};
     }
 
+    /**
+     * Merge movements and balances and sort them by date asc
+     *
+     * @param {ValidationDataDto} validationDataDto
+     * @returns {Line[]}
+     * @memberof AppService
+     */
     mergeAndSortData(validationDataDto: ValidationDataDto): Line[] {
         const inputDataMerged = [...validationDataDto.movements, ...validationDataDto.balances]; // we first merge movemnets and balances
         // below I'm not assuming any specific date format, hence the use of moment.diff() and the simple string declaration in interfaces
@@ -35,10 +49,24 @@ export class AppService {
         return inputDataMerged.sort((a: Line, b: Line) => moment(a.date).isBefore(b.date) ? -1 : 1); // we sort everything by date asc
     }
 
+    /**
+     * Search and flag potential duplicates (adding isDuplicate: true)
+     *
+     * @param {Line[]} inputDataMerged
+     * @returns {Line[]}
+     * @memberof AppService
+     */
     flagDuplicates(inputDataMerged: Line[]): Line[] {
         return inputDataMerged.reduce((p,c) => p.some(o => Utils.compareObjects(o, c)) ? (c.isDuplicate = true, p.concat(c)) : p.concat(c),[]); // marking duplicate movement or balance, maybe the test (Utils.compareObjects) should not be so strict
     }
 
+    /**
+     * Parse given lines and populate potential errors
+     *
+     * @param {Line[]} markedInputDataMerged
+     * @returns {Reasons}
+     * @memberof AppService
+     */
     checkForErrors(markedInputDataMerged: Line[]): Reasons {
         let currentFoundBalance = 0;
         let currentComputedBalance = 0;
@@ -60,7 +88,7 @@ export class AppService {
                 currentFoundBalance = (line as Balance).balance;
                 if (currentComputedBalance !== currentFoundBalance) {
                     balanceErrors.push({
-                        start: currentBalance,
+                        start: currentBalance ? currentBalance : null,
                         end: nextBalance,
                         diff: {
                             expected: currentFoundBalance,
@@ -86,6 +114,14 @@ export class AppService {
         return this.buildErrorObject(balanceErrors, duplicateErrors);
     }
 
+    /**
+     * Build error object for output
+     *
+     * @param {BalanceError[]} balanceErrors
+     * @param {DuplicateError} duplicateErrors
+     * @returns {Reasons}
+     * @memberof AppService
+     */
     buildErrorObject(balanceErrors: BalanceError[], duplicateErrors: DuplicateError): Reasons {
         const reasons = {} as Reasons; // preparing reasons error object
         if (balanceErrors.length > 0) {
