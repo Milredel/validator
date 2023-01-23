@@ -26,11 +26,11 @@ export class AppService {
      */
     validate(validationDataDto: ValidationDataDto): {result: string, reasons: Reasons} {
 
-        const inputDataMerged = this.mergeAndSortData(validationDataDto);
+        const inputDataMerged = this.mergeAndSortData(validationDataDto); // first I merge movements and balances in one single array, I then sort them by date asc
 
-        const markedInputDataMerged = this.flagDuplicates(inputDataMerged);
+        const markedInputDataMerged = this.flagDuplicates(inputDataMerged); // I then mark as duplicates movement or balance I find more than one in the array
 
-        const reasons = this.checkForErrors(markedInputDataMerged);
+        const reasons = this.checkForErrors(markedInputDataMerged); // Finally, I loop through the array to find potential balance error or duplicate error
 
         return {result: 'ok', reasons: reasons};
     }
