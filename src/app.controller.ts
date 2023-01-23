@@ -30,15 +30,17 @@ export class AppController {
      * @returns response
      */
     @Post('/movements/validation')
-    validation(@Body() validationDataDto: ValidationDataDto, @Req() request: Request, @Res() response) {
+    validation(@Body() validationDataDto: ValidationDataDto, @Res() response) {
 
         const {result, reasons} = this.appService.validate(validationDataDto);
 
-        if (!Utils.isEmpty(reasons)) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
-            return response.status(HttpStatus.I_AM_A_TEAPOT).send({statusCode: HttpStatus.I_AM_A_TEAPOT, reasons: reasons});
+        if (reasons) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
+            response.status(HttpStatus.I_AM_A_TEAPOT);
+            return response.send({statusCode: HttpStatus.I_AM_A_TEAPOT, reasons: reasons});
         }
 
-        return response.status(HttpStatus.ACCEPTED).send({statusCode: HttpStatus.ACCEPTED, message: 'Accepted'});
+        response.status(HttpStatus.ACCEPTED);
+        return response.send({statusCode: HttpStatus.ACCEPTED, message: 'Accepted'});
     }
 
 }

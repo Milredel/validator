@@ -100,7 +100,7 @@ export class AppService {
                 reasons.duplicates.balances = duplicateErrors.balances;
             }
         }
-        return reasons;
+        return !Utils.isEmpty(reasons) ? reasons : null;
     }
 
 }
