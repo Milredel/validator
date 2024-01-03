@@ -1,9 +1,12 @@
-import { Controller, Request, Get, Body, Post, HttpStatus, Req, Res, Inject } from '@nestjs/common';
+import { Controller, Request, Get, Body, Post, HttpStatus, Req, Res, Inject, UseInterceptors, UploadedFile, ParseFilePipeBuilder } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationDataDto } from './common/dto/validationData.dto';
 import { AppService } from './app.service';
 import { Utils } from './common/utils/utils';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileDto } from './common/dto/file.dto';
+import { diskStorage } from 'multer';
 
 @Controller()
 export class AppController {
@@ -41,6 +44,25 @@ export class AppController {
 
         response.status(HttpStatus.ACCEPTED);
         return response.send({statusCode: HttpStatus.ACCEPTED, message: 'Accepted'});
+    }
+
+    @UseInterceptors(FileInterceptor('file', {storage: diskStorage({destination: './uploads', filename: Utils.editFileName})}))
+    @Post('file')
+    uploadFile(
+        @UploadedFile(
+        new ParseFilePipeBuilder()
+            .addFileTypeValidator({
+                fileType: 'json',
+            })
+            .build({
+                fileIsRequired: false,
+            }),
+        )
+        file?: Express.Multer.File,
+    ) {
+        return {
+            fileName: file?.filename,
+        };
     }
 
 }
