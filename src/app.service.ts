@@ -140,8 +140,8 @@ export class AppService {
         return !Utils.isEmpty(reasons) ? reasons : null;
     }
 
-    getContentFromFile(fileName: string) {
-        const data = fs.readFileSync('./uploads/' + fileName , 'utf8')
+    getContentFromFile(fileName: string, prefix = 'uploads') {
+        const data = fs.readFileSync(`./${prefix}/` + fileName , 'utf8')
         return JSON.parse(data)
     }
 

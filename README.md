@@ -31,9 +31,6 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
-
-# test coverage
-$ npm run test:coverage
 ```
 
 ## Usage

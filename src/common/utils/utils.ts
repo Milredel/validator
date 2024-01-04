@@ -10,7 +10,7 @@ export abstract class Utils {
         return obj && Object.keys(obj).length === 0 && Object.getPrototypeOf(obj) === Object.prototype;
     }
 
-    static editFileName = (req, file, callback) => {
+    static editFileName = (_, file: Express.Multer.File, callback) => {
         const name = file.originalname.split('.')[0];
         const fileExtName = extname(file.originalname);
         const randomName = Array(4)
