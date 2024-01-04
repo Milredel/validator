@@ -54,17 +54,19 @@ export class AppController {
      */
     @Post('/movements/validation/file')
     async validationByFile(@Body() file: FileDto, @Res() response) {
-        const toValidate = new ValidationDataDto()
+        let data
         try {
             const content = this.appService.getContentFromFile(file.name);
+            const toValidate = new ValidationDataDto()
             toValidate.movements = content.movements
             toValidate.balances = content.balances
             await validateOrReject(toValidate)
-            const {reasons} = this.appService.validate(toValidate);
+            const {reasons, mergedData} = this.appService.validate(toValidate);
+            data = mergedData
             this.appService.deleteFile(file.name); // maybe not a good solution here, we might want to keep the file further along
             if (reasons) {
                 response.status(HttpStatus.ACCEPTED);
-                return response.send({statusCode: HttpStatus.ACCEPTED, reasons: reasons, content: toValidate});
+                return response.send({statusCode: HttpStatus.ACCEPTED, reasons: reasons, content: data});
             }
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -72,7 +74,7 @@ export class AppController {
         }
 
         response.status(HttpStatus.ACCEPTED);
-        return response.send({statusCode: HttpStatus.ACCEPTED, content: toValidate});
+        return response.send({statusCode: HttpStatus.ACCEPTED, content: data});
     }
 
     /**

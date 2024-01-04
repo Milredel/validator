@@ -25,7 +25,7 @@ export class AppService {
      * @returns {{result: string, reasons: Reasons}}
      * @memberof AppService
      */
-    validate(validationDataDto: ValidationDataDto): {result: string, reasons: Reasons} {
+    validate(validationDataDto: ValidationDataDto): {result: string, reasons: Reasons, mergedData: Line[]} {
 
         const inputDataMerged = this.mergeAndSortData(validationDataDto); // first I merge movements and balances in one single array, I then sort them by date asc
 
@@ -33,7 +33,7 @@ export class AppService {
 
         const reasons = this.checkForErrors(markedInputDataMerged); // Finally, I loop through the array to find potential balance error or duplicate error
 
-        return {result: 'ok', reasons: reasons};
+        return {result: 'ok', reasons: reasons, mergedData: inputDataMerged};
     }
 
     /**
