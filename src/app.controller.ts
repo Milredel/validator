@@ -7,6 +7,7 @@ import { Utils } from './common/utils/utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileDto } from './common/dto/file.dto';
 import { diskStorage } from 'multer';
+import { validate, validateOrReject } from 'class-validator';
 
 @Controller()
 export class AppController {
@@ -35,7 +36,7 @@ export class AppController {
     @Post('/movements/validation')
     validation(@Body() validationDataDto: ValidationDataDto, @Res() response) {
 
-        const {result, reasons} = this.appService.validate(validationDataDto);
+        const {reasons} = this.appService.validate(validationDataDto);
 
         if (reasons) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
             response.status(HttpStatus.I_AM_A_TEAPOT);
@@ -46,6 +47,39 @@ export class AppController {
         return response.send({statusCode: HttpStatus.ACCEPTED, message: 'Accepted'});
     }
 
+    /**
+     * Compute validation by file and return result accordingly
+     *
+     * @returns response
+     */
+    @Post('/movements/validation/file')
+    async validationByFile(@Body() file: FileDto, @Res() response) {
+        const toValidate = new ValidationDataDto()
+        try {
+            const content = this.appService.getContentFromFile(file.name);
+            toValidate.movements = content.movements
+            toValidate.balances = content.balances
+            await validateOrReject(toValidate)
+            const {reasons} = this.appService.validate(toValidate);
+            this.appService.deleteFile(file.name); // maybe not a good solution here, we might want to keep the file further along
+            if (reasons) {
+                response.status(HttpStatus.ACCEPTED);
+                return response.send({statusCode: HttpStatus.ACCEPTED, reasons: reasons, content: toValidate});
+            }
+        } catch (error) {
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR);
+            return response.send({statusCode: HttpStatus.INTERNAL_SERVER_ERROR, message: error});
+        }
+
+        response.status(HttpStatus.ACCEPTED);
+        return response.send({statusCode: HttpStatus.ACCEPTED, content: toValidate});
+    }
+
+    /**
+     * Receive a file (json only), store it on disk and send the server file name back
+     *
+     * @returns response
+     */
     @UseInterceptors(FileInterceptor('file', {storage: diskStorage({destination: './uploads', filename: Utils.editFileName})}))
     @Post('file')
     uploadFile(
