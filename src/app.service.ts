@@ -7,7 +7,6 @@ import { Balance } from './common/interfaces/balance.interface';
 import { Movement } from './common/interfaces/movement.interface';
 import { Utils } from './common/utils/utils';
 import * as moment from 'moment';
-import * as fs from 'fs';
 
 export type Line = Movement | Balance;
 
@@ -138,15 +137,6 @@ export class AppService {
             }
         }
         return !Utils.isEmpty(reasons) ? reasons : null;
-    }
-
-    getContentFromFile(fileName: string, prefix = 'uploads') {
-        const data = fs.readFileSync(`./${prefix}/` + fileName , 'utf8')
-        return JSON.parse(data)
-    }
-
-    deleteFile(fileName: string) {
-        fs.unlinkSync('./uploads/' + fileName)
     }
 
 }

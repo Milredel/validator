@@ -26,4 +26,10 @@ describe('Utils', () => {
         });
     });
 
+    describe('cleanFileName', () => {
+        it('should clean filename correctly', () => {
+            expect(Utils.cleanFileName('payload-ko-45a3.json')).toBe('payload-ko-fixed.json')
+        })
+    })
+
 });

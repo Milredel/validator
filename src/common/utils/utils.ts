@@ -20,4 +20,6 @@ export abstract class Utils {
         callback(null, `${name}-${randomName}${fileExtName}`);
     }
 
+    static cleanFileName = (fileName: string): string => fileName.replace(/(.*)-[a-z0-9]{4}\.json/, '$1-fixed.json')
+
 }

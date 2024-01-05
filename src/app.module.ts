@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { AppService } from './app.service';
+import { FileService } from './file.service';
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { AppService } from './app.service';
     ],
     providers: [
         AppService,
+        FileService,
     ],
     exports: [
         AppService,

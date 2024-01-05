@@ -1,4 +1,4 @@
-import { Controller, Request, Get, Body, Post, HttpStatus, Req, Res, Inject, UseInterceptors, UploadedFile, ParseFilePipeBuilder } from '@nestjs/common';
+import { Controller, Get, Body, Post, HttpStatus, Res, Inject, UseInterceptors, UploadedFile, ParseFilePipeBuilder, StreamableFile } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ValidationDataDto } from './common/dto/validationData.dto';
@@ -7,7 +7,11 @@ import { Utils } from './common/utils/utils';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileDto } from './common/dto/file.dto';
 import { diskStorage } from 'multer';
-import { validate, validateOrReject } from 'class-validator';
+import { validateOrReject } from 'class-validator';
+import { CreateValidationDto } from './common/dto/createValidation.dto';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import { FileService } from './file.service';
 
 @Controller()
 export class AppController {
@@ -15,6 +19,7 @@ export class AppController {
     constructor(
         @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
         private appService: AppService,
+        private fileService: FileService,
     ) { }
 
     /**
@@ -56,14 +61,14 @@ export class AppController {
     async validationByFile(@Body() file: FileDto, @Res() response) {
         let data
         try {
-            const content = this.appService.getContentFromFile(file.name);
+            const content = this.fileService.getContentFromFile(file.name);
             const toValidate = new ValidationDataDto()
             toValidate.movements = content.movements
             toValidate.balances = content.balances
             await validateOrReject(toValidate)
             const {reasons, mergedData} = this.appService.validate(toValidate);
             data = mergedData
-            this.appService.deleteFile(file.name); // maybe not a good solution here, we might want to keep the file further along
+            this.fileService.deleteFile(file.name); // maybe not a good solution here, we might want to keep the file further along
             if (reasons) {
                 response.status(HttpStatus.ACCEPTED);
                 return response.send({statusCode: HttpStatus.ACCEPTED, reasons: reasons, content: data});
@@ -99,6 +104,25 @@ export class AppController {
         return {
             fileName: file?.filename,
         };
+    }
+
+    /**
+     * Create file based on received data and fileName and return it
+     *
+     * @returns response
+     */
+    @Post('/movements/validation/create')
+    createValidationFile(@Body() createValidationDto: CreateValidationDto, @Res({ passthrough: true }) res) {
+
+        const newFileName = Utils.cleanFileName(createValidationDto.fileName);
+        const serverFileName = this.fileService.createFile(createValidationDto.data);
+
+        const file = createReadStream(join(process.cwd(), './uploads/' + serverFileName));
+        res.set({
+            'Content-Type': 'application/json',
+            'Content-Disposition': `attachment; filename=${newFileName}`,
+        });
+        return new StreamableFile(file);
     }
 
 }

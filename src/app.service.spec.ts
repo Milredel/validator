@@ -1,12 +1,14 @@
 import { AppService } from "./app.service";
-
+import { FileService } from "./file.service";
 
 describe('AppService', () => {
 
     let appService: AppService;
+    let fileService: FileService;
 
     beforeEach(() => {
         appService = new AppService()
+        fileService = new FileService()
     })
 
     describe('buildErrorObject', () => {
@@ -193,7 +195,7 @@ describe('AppService', () => {
 
     describe('validate', () => {
         test('should return correct info if everything is ok', () => {
-            const contentOK = appService.getContentFromFile('payload-ok.json', 'test')
+            const contentOK = fileService.getContentFromFile('payload-ok.json', 'test')
             const res = appService.validate(contentOK);
             expect(res).toStrictEqual({
                 mergedData: [
@@ -212,7 +214,7 @@ describe('AppService', () => {
         });
 
         test('should return correct info if it is ko', () => {
-            const contentOK = appService.getContentFromFile('payload-ko.json', 'test')
+            const contentOK = fileService.getContentFromFile('payload-ko.json', 'test')
             const res = appService.validate(contentOK);
             expect(res).toStrictEqual({
                 mergedData: [
