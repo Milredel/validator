@@ -36,15 +36,15 @@ export class AppController {
     @Post('/movements/validation')
     validation(@Body() validationDataDto: ValidationDataDto, @Res() response) {
 
-        const {reasons} = this.appService.validate(validationDataDto);
+        const {reasons, mergedData} = this.appService.validate(validationDataDto);
 
-        if (reasons) { // if errors, returning a HttpStatus.I_AM_A_TEAPOT
-            response.status(HttpStatus.I_AM_A_TEAPOT);
-            return response.send({statusCode: HttpStatus.I_AM_A_TEAPOT, reasons: reasons});
+        if (reasons) {
+            response.status(HttpStatus.ACCEPTED);
+            return response.send({statusCode: HttpStatus.ACCEPTED, reasons: reasons, content: mergedData});
         }
 
         response.status(HttpStatus.ACCEPTED);
-        return response.send({statusCode: HttpStatus.ACCEPTED, message: 'Accepted'});
+        return response.send({statusCode: HttpStatus.ACCEPTED, content: mergedData});
     }
 
     /**
