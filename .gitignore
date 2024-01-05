@@ -35,6 +35,3 @@ lerna-debug.log*
 .history/
 
 .env
-
-# tmp files
-/uploads
